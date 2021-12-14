@@ -16,8 +16,14 @@
 
 #define SERIAL_PORT "/dev/ttyACM2"
 
-int main() {
-  std::cout << "hey";
+int main(int argc, char* argv[]) {
+  if (argc != 2) {
+    std::cout << "ERROR: no serial port given as input argument" << std::endl;
+    return 0;
+  }
+  std::string serial_port = argv[1];
+  std::cout << "Initializing serial connection to port " << serial_port
+            << " ..." << std::endl;
   // Fastdds (We need to create a new message for gripper commands, but for now
   // we just use a position command message and use the x element to send
   // gripper commands)
@@ -35,9 +41,9 @@ int main() {
 
   // If connection fails, return the error code otherwise, display a success
   // message
-  char errorOpening = serial.openDevice(SERIAL_PORT, 115200);
+  char errorOpening = serial.openDevice(serial_port.c_str(), 115200);
   if (errorOpening != 1) return errorOpening;
-  std::cout << "Successful connection to " << SERIAL_PORT << std::endl;
+  std::cout << "Successful connection to " << serial_port << std::endl;
 
   // cout loop fro testing
   while (true) {
@@ -52,4 +58,5 @@ int main() {
     std::cout << (int)sub::grip_cmd.position.x << std::endl;
   }
   serial.closeDevice();
+  return 0;
 }
