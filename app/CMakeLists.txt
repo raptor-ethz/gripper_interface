@@ -1,4 +1,4 @@
-add_executable(gripper_interface src/main.cpp)
+add_executable(gripper_interface src/main.cpp include/serialib/serialib.cpp )
 
 target_include_directories(gripper_interface PUBLIC include)
 
