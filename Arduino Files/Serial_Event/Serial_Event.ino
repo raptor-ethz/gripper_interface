@@ -1,73 +1,67 @@
-/*
-  Serial Event example
- 
- When new serial data arrives, this sketch adds it to a String.
- When a newline is received, the loop prints the string and clears it.
- 
- A good test for this is to try it with a GPS receiver that sends out
- NMEA 0183 sentences.
- 
- NOTE: The serialEvent() feature is not available on the Leonardo, Micro, or
- other ATmega32U4 based boards.
- 
- created 9 May 2011
- by Tom Igoe
- 
- This example code is in the public domain.
- 
- https://www.arduino.cc/en/Tutorial/BuiltInExamples/SerialEvent
- */
+#include <Servo.h>
+
 boolean newCommand = false;
 boolean gripperStatus = false;
-int LEDPIN = 6;
+
+// servos for right and left grippers
+Servo r_servo;  
+Servo l_servo; 
+
+// set gripper opening limit
+const int max_angle = 45;
+
+//angle from serial
+int angle = 0;
+
+// go to gripper home position
+void close_fully();
+
+// set angle for both gripper arms at once
+void set_angle(int angle);
 
 void setup() {
   // initialize serial:
   Serial.begin(115200);
-  pinMode(LEDPIN, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
+
+  r_servo.attach(9);
+  l_servo.attach(6);
+  close_fully();
 }
 
 void loop() {
   //digitalWrite(LEDPIN, HIGH);
-
   if(newCommand == true){
-    if(gripperStatus==false){
-      digitalWrite(LEDPIN, LOW);
-    }
-    if(gripperStatus==true){
-      digitalWrite(LEDPIN, HIGH);
-    } 
+    set_angle(angle);
     newCommand = false;
   }
 }
 
 /*
   SerialEvent occurs whenever a new data comes in the hardware serial RX. This
- routine is run between each time loop() runs, so using delay inside loop can
- delay response. Multiple bytes of data may be available.
- */
+  routine is run between each time loop() runs, so using delay inside loop can
+  delay response. Multiple bytes of data may be available.
+*/
 void serialEvent() {
   while (Serial.available()) {
-    char inChar = (char)Serial.read();
-    //Serial.print(inChar);
-    switch (inChar) {
-    case 'a':
-      gripperStatus=true;
-      digitalWrite(LED_BUILTIN, LOW);
-      break;
-    case 'b':
-      gripperStatus=false;
-      digitalWrite(LED_BUILTIN, LOW);
-      break;
-    default:
-      digitalWrite(LED_BUILTIN, HIGH);
-      break;
-
-    }
+    angle = (int)Serial.read();
     newCommand=true;
   }
 
 }
 
 
+void set_angle(int angle) {
+
+  if (angle <= max_angle ) {
+    l_servo.write(angle);
+    r_servo.write(180 - angle);
+  }
+}
+
+void close_fully() {
+  set_angle(0);
+}
+
+void open_fully() {
+  set_angle(max_angle);
+}
