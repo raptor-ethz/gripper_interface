@@ -1,8 +1,10 @@
 // Fastdds
 #include <stdio.h>
+#include <string.h>
 #include <sub_callback.h>
 
 #include <iostream>
+#include <string>
 
 #include "default_participant.h"
 #include "default_subscriber.h"
@@ -48,13 +50,8 @@ int main(int argc, char* argv[]) {
   // cout loop fro testing
   while (true) {
     cmd_sub.listener->wait_for_data();
-    if (sub::grip_cmd.position.x == 1) {
-      serial.writeChar('a');
-    }
-    if (sub::grip_cmd.position.x == 0) {
-      serial.writeChar('b');
-    }
-
+    unsigned int temp_int = (float)sub::grip_cmd.position.x;
+    serial.writeChar((char)temp_int);
     std::cout << (int)sub::grip_cmd.position.x << std::endl;
   }
   serial.closeDevice();
