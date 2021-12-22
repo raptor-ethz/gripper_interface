@@ -10,7 +10,7 @@ Servo l_servo;
 
 int angle_cmd = 0;
 // set gripper opening limit
-const int max_angle = 70;
+const int max_angle = 90;
 
 // go to gripper home position
 void close_fully();
@@ -32,6 +32,12 @@ void setup() {
 void loop() {
   // digitalWrite(LEDPIN, HIGH);
   if (newCommand == true) {
+    if(angle_cmd<max_angle){
+      l_servo.write(angle_cmd);
+    }
+    if(angle_cmd>=max_angle){
+      r_servo.write(180 - (angle_cmd-max_angle));
+    }
     set_angle(angle_cmd);
     newCommand = false;
     digitalWrite(LED_BUILTIN, LOW);
