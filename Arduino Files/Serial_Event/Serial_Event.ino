@@ -36,8 +36,8 @@ void setup() {
 */
 void serialEvent() {
   while (Serial.available()) {
-    left_cmd = (int)Serial.read();
-    right_cmd = (int)Serial.read();
+    int left_cmd = (int)Serial.read();
+    int right_cmd = (int)Serial.read();
     l_servo.write(left_cmd);
     r_servo.write(right_cmd);
     // angle_cmd = (int)Serial.read();
