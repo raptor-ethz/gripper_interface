@@ -2,8 +2,6 @@
 
 boolean newCommand = false;
 boolean gripperStatus = false;
-int LEDPIN = 6;
-
 // servos for right and left grippers
 Servo r_servo;
 Servo l_servo;
@@ -21,7 +19,6 @@ void set_angle(int angle);
 void setup() {
   // initialize serial:
   Serial.begin(115200);
-  pinMode(LEDPIN, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
   r_servo.attach(9);
@@ -32,11 +29,11 @@ void setup() {
 void loop() {
   // digitalWrite(LEDPIN, HIGH);
   if (newCommand == true) {
-    if(angle_cmd<max_angle){
+    if (angle_cmd < max_angle) {
       l_servo.write(angle_cmd);
     }
-    if(angle_cmd>=max_angle){
-      r_servo.write(180 - (angle_cmd-max_angle));
+    if (angle_cmd >= max_angle) {
+      r_servo.write(180 - (angle_cmd - max_angle));
     }
     set_angle(angle_cmd);
     newCommand = false;
