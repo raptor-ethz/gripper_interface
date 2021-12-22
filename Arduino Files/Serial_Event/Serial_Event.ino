@@ -10,7 +10,7 @@ Servo l_servo;
 
 int angle_cmd = 0;
 // set gripper opening limit
-const int max_angle = 90;
+const int max_angle = 80;
 
 // go to gripper home position
 void close_fully();
@@ -29,16 +29,6 @@ void setup() {
   close_fully();
 }
 
-void loop() {
-  // digitalWrite(LEDPIN, HIGH);
-  if (newCommand == true) {
-   
-    newCommand = false;
-    digitalWrite(LED_BUILTIN, LOW);
-  } else {
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-}
 /*
   SerialEvent occurs whenever a new data comes in the hardware serial RX. This
   routine is run between each time loop() runs, so using delay inside loop can
@@ -46,13 +36,21 @@ void loop() {
 */
 void serialEvent() {
   while (Serial.available()) {
-    angle_cmd = (int)Serial.read();
-     if(angle_cmd<max_angle){
-      l_servo.write(angle_cmd);
-    }
-    if(angle_cmd>=max_angle){
-      r_servo.write(180 - (angle_cmd-max_angle));
-    }
+    left_cmd = (int)Serial.read();
+    right_cmd = (int)Serial.read();
+    l_servo.write(left_cmd);
+    r_servo.write(right_cmd);
+    // angle_cmd = (int)Serial.read();
+    // if (angle_cmd < max_angle) { //left servos
+    //   l_servo.write(angle_cmd);
+    // }
+    // if ((angle_cmd >= max_angle) && (angle_cmd < 2 * max_angle)) { //right
+    // servos
+    //   r_servo.write(180 - (angle_cmd - max_angle));
+    // }
+    // if (angle_cmd >= 2 * max_angle) { //both servos
+    //   set_angle(angle_cmd - 2 * max_angle)
+    // }
   }
 }
 
