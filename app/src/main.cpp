@@ -50,8 +50,8 @@ int main(int argc, char* argv[]) {
   // cout loop fro testing
   while (true) {
     cmd_sub.listener->wait_for_data();
-    unsigned int temp_int = (float)sub::grip_cmd.position.x;
-    serial.writeChar((char)temp_int);
+    int cmd = (float)sub::grip_cmd.position.x;
+    serial.writeChar((char)cmd);
     std::cout << (int)sub::grip_cmd.position.x << std::endl;
   }
   serial.closeDevice();

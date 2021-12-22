@@ -1,68 +1,36 @@
 #include <Servo.h>
 
-boolean newCommand = false;
-boolean gripperStatus = false;
-int LEDPIN = 6;
-
 // servos for right and left grippers
 Servo r_servo;
 Servo l_servo;
 
-int angle_cmd = 0;
-// set gripper opening limit
-const int max_angle = 90;
-
-// go to gripper home position
-void close_fully();
-
-// set angle for both gripper arms at once
-void set_angle(int angle);
+const int max_angle = 80;
 
 void setup() {
   // initialize serial:
   Serial.begin(115200);
-  pinMode(LEDPIN, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
 
   r_servo.attach(9);
   l_servo.attach(6);
-  close_fully();
+
+  // close fully
+  l_servo.write(5);
+  r_servo.write(175);
 }
 
-void loop() {
-  // digitalWrite(LEDPIN, HIGH);
-  if (newCommand == true) {
-   
-    newCommand = false;
-    digitalWrite(LED_BUILTIN, LOW);
-  } else {
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-}
-/*
-  SerialEvent occurs whenever a new data comes in the hardware serial RX. This
-  routine is run between each time loop() runs, so using delay inside loop can
-  delay response. Multiple bytes of data may be available.
-*/
+void loop() {}
 void serialEvent() {
   while (Serial.available()) {
-    angle_cmd = (int)Serial.read();
-     if(angle_cmd<max_angle){
-      l_servo.write(angle_cmd);
+    int cmd = (int)Serial.read();
+    if ((cmd >= 0) && (cmd < max_angle)) {  // left arm
+      l_servo.write(cmd);
     }
-    if(angle_cmd>=max_angle){
-      r_servo.write(180 - (angle_cmd-max_angle));
+    if ((cmd >= max_angle) && (cmd < 2 * max_angle)) {  // right arm
+      r_servo.write(180 - (cmd - max_angle));
+    }
+    if ((cmd >= 2 * max_angle) && (cmd < 3 * max_angle)) {  // both arms
+      l_servo.write(cmd - 2 * max_angle);
+      r_servo.write(180 - (cmd - 2 * max_angle));
     }
   }
 }
-
-void set_angle(int angle) {
-  if (angle <= max_angle) {
-    l_servo.write(angle);
-    r_servo.write(180 - angle);
-  }
-}
-
-void close_fully() { set_angle(0); }
-
-void open_fully() { set_angle(max_angle); }
