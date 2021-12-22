@@ -4,6 +4,8 @@
 Servo r_servo;
 Servo l_servo;
 
+const int max_angle = 80;
+
 void setup() {
   // initialize serial:
   Serial.begin(115200);
@@ -19,9 +21,16 @@ void setup() {
 void loop() {}
 void serialEvent() {
   while (Serial.available()) {
-    int left_cmd = (int)Serial.read();
-    int right_cmd = (int)Serial.read();
-    l_servo.write(left_cmd);
-    r_servo.write(180 - right_cmd);
+    int cmd = (int)Serial.read();
+    if (cmd >= 0 && cmd < max_angle) {  // left arm
+      l_servo.write(cmd);
+    }
+    if (cmd >= max_angle && cmd < 2 * max_angle) {  // right arm
+      r_servo.write(180 - (cmd - max_angle));
+    }
+    if (cmd >= 2 * max_angle && cmd < 3 * max_angle) {  // both arms
+      l_servo.write(cmd - 2 * max_angle);
+      r_servo.write(180 - (cmd - 2 * max_angle));
+    }
   }
 }
