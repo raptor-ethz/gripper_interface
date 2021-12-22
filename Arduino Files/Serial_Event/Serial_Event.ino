@@ -14,7 +14,7 @@ void setup() {
   l_servo.attach(6);
 
   // close fully
-  l_servo.write(25);
+  l_servo.write(5);
   r_servo.write(175);
 }
 
