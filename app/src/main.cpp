@@ -29,8 +29,7 @@ int main(int argc, char* argv[]) {
   // Fastdds (We need to create a new message for gripper commands, but for now
   // we just use a position command message and use the x element to send
   // gripper commands)
-  // sub::pos_cmd.position.x = 1 -> gripper closes
-  // sub::pos_cmd.position.x = 0 -> gripper opens
+
   // Create participant. Arguments-> Domain id, QOS name
   DefaultParticipant dp(0, "gripper_interface");
   // Create subscriber with msg type
