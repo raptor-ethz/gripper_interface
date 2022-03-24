@@ -18,7 +18,7 @@
 
 #define SERIAL_PORT "/dev/ttyACM2"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   if (argc != 2) {
     std::cout << "ERROR: no serial port given as input argument" << std::endl;
     return 0;
@@ -44,7 +44,8 @@ int main(int argc, char* argv[]) {
   // If connection fails, return the error code otherwise, display a success
   // message
   char errorOpening = serial.openDevice(serial_port.c_str(), 115200);
-  if (errorOpening != 1) return errorOpening;
+  if (errorOpening != 1)
+    return errorOpening;
   std::cout << "Successful connection to " << serial_port << std::endl;
 
   // cout loop fro testing
