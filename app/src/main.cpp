@@ -6,9 +6,9 @@
 #include <iostream>
 #include <string>
 
-#include "default_participant.h"
-#include "default_subscriber.h"
+#include "domain_participant.h"
 #include "sub_callback.h"
+#include "subscriber.h"
 
 // serialib
 #include <stdio.h>
@@ -17,6 +17,8 @@
 #include "../include/serialib/serialib.h"
 
 #define SERIAL_PORT "/dev/ttyACM2"
+
+const int max_angle = 80; // defined also in arduino code
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
@@ -29,15 +31,14 @@ int main(int argc, char *argv[]) {
   // Fastdds (We need to create a new message for gripper commands, but for now
   // we just use a position command message and use the x element to send
   // gripper commands)
-  // sub::pos_cmd.position.x = 1 -> gripper closes
-  // sub::pos_cmd.position.x = 0 -> gripper opens
+
   // Create participant. Arguments-> Domain id, QOS name
   DefaultParticipant dp(0, "gripper_interface");
   // Create subscriber with msg type
-  DDSSubscriber cmd_sub(idl_msg::QuadPositionCmdPubSubType(), &sub::grip_cmd,
-                        "grip_cmd", dp.participant());
+  DDSSubscriber grip_cmd_sub(idl_msg::RotGripCmd_msgPubSubType(),
+                             &sub::grip_cmd, "grip_cmd", dp.participant());
   // Intiailize fastdds subscriber
-  cmd_sub.init();
+  // cmd_sub.init();
   // Serial object
   serialib serial;
 
@@ -50,10 +51,23 @@ int main(int argc, char *argv[]) {
 
   // cout loop fro testing
   while (true) {
-    cmd_sub.listener->wait_for_data();
-    int cmd = (float)sub::grip_cmd.position.x;
-    serial.writeChar((char)cmd);
-    std::cout << (int)sub::grip_cmd.position.x << std::endl;
+    grip_cmd_sub.listener->wait_for_data();
+
+    if (sub::grip_cmd.front_arm_deg !=
+        sub::grip_cmd.back_arm_deg) { // set arms individually
+
+      int front_cmd = sub::grip_cmd.front_arm_deg;
+      serial.writeChar((char)front_cmd);
+
+      int back_cmd = sub::grip_cmd.back_arm_deg + max_angle;
+      serial.writeChar((char)back_cmd);
+    } else { // set both arms with the same angle
+      int sym_cmd = sub::grip_cmd.front_arm_deg + 2 * max_angle;
+      serial.writeChar((char)sym_cmd);
+    }
+
+    std::cout << "front arm: " << sub::grip_cmd.front_arm_deg << "\t back arm "
+              << sub::grip_cmd.back_arm_deg << std::endl;
   }
   serial.closeDevice();
   return 0;
