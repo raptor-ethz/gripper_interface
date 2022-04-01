@@ -51,25 +51,25 @@ int main(int argc, char *argv[]) {
 
   // cout loop fro testing
   while (true) {
-/*    grip_cmd_sub.listener->wait_for_data();
+    grip_cmd_sub.listener->wait_for_data();
 
-    if(sub::grip_cmd.front_arm_deg!=79){
-	int front_cmd = sub::grip_cmd.front_arm_deg;
-	serial.writeChar((char)front_cmd);
+    int front_cmd = sub::grip_cmd.front_arm_deg;
+    serial.writeChar((char)front_cmd);
 
-	int back_cmd = sub::grip_cmd.back_arm_deg + max_angle;
-	serial.writeChar((char)back_cmd);
+    int back_cmd = sub::grip_cmd.back_arm_deg + max_angle;
+    serial.writeChar((char)back_cmd);
+
+    if (sub::grip_cmd.trigger_gripper == true) {
+      serial.writeChar((char)180);
     }
-    if(sub::grip_cmd.front_arm_deg==79){
-	serial.writeChar((char)180);
-    }*/
-    //std::cout << "front arm: " << sub::grip_cmd.front_arm_deg << "\t back arm "
-    //          << sub::grip_cmd.back_arm_deg << std::endl;
-    char force_val = 'a';
-    serial.readChar(&force_val, 20);
-    if((int)force_val!=97){
-    std::cout<<"force value: "<<(int)force_val<<std::endl;
-}
+    // std::cout << "front arm: " << sub::grip_cmd.front_arm_deg << "\t back arm
+    // "
+    //           << sub::grip_cmd.back_arm_deg << std::endl;
+    // char force_val = 'a';
+    // serial.readChar(&force_val, 20);
+    // if ((int)force_val != 97) {
+    //   std::cout << "force value: " << (int)force_val << std::endl;
+    // }
   }
   serial.closeDevice();
   return 0;
