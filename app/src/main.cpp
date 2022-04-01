@@ -59,9 +59,9 @@ int main(int argc, char *argv[]) {
     int back_cmd = sub::grip_cmd.back_arm_deg + max_angle;
     serial.writeChar((char)back_cmd);
 
-    if (sub::grip_cmd.trigger_gripper == true) {
-      serial.writeChar((char)180);
-    }
+    // if (sub::grip_cmd.trigger_gripper == true) {
+    //   serial.writeChar((char)180);
+    // }
     // std::cout << "front arm: " << sub::grip_cmd.front_arm_deg << "\t back arm
     // "
     //           << sub::grip_cmd.back_arm_deg << std::endl;
