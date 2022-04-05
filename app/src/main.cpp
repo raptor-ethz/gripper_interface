@@ -9,6 +9,7 @@
 #include "domain_participant.h"
 #include "sub_callback.h"
 #include "subscriber.h"
+#include "publisher.h"
 
 // serialib
 #include <stdio.h>
@@ -20,8 +21,10 @@
 
 const int max_angle = 80; // defined also in arduino code
 
-int main(int argc, char *argv[]) {
-  if (argc != 2) {
+int main(int argc, char *argv[])
+{
+  if (argc != 2)
+  {
     std::cout << "ERROR: no serial port given as input argument" << std::endl;
     return 0;
   }
@@ -37,6 +40,9 @@ int main(int argc, char *argv[]) {
   // Create subscriber with msg type
   DDSSubscriber grip_cmd_sub(idl_msg::RotGripCmd_msgPubSubType(),
                              &sub::grip_cmd, "grip_cmd", dp.participant());
+  // Create publisher with msg type
+  DDSPublisher sensor_msg_pub(idl_msg::GripperSensor_msgPubSubType(),
+                              "sensor_msg", dp.participant());
   // Intiailize fastdds subscriber
   // cmd_sub.init();
   // Serial object
@@ -50,7 +56,8 @@ int main(int argc, char *argv[]) {
   std::cout << "Successful connection to " << serial_port << std::endl;
 
   // cout loop fro testing
-  while (true) {
+  while (true)
+  {
     grip_cmd_sub.listener->wait_for_data();
 
     int front_cmd = sub::grip_cmd.front_arm_deg;
@@ -59,9 +66,20 @@ int main(int argc, char *argv[]) {
     int back_cmd = sub::grip_cmd.back_arm_deg + max_angle;
     serial.writeChar((char)back_cmd);
 
-    // if (sub::grip_cmd.trigger_gripper == true) {
-    //   serial.writeChar((char)180);
-    // }
+    if (sub::grip_cmd.trigger_gripper == true)
+    {
+      serial.writeChar((char)180);
+    }
+
+    if (sub::grip_cmd.get_sensor_val == true)
+    {
+      /*TODO*/
+      pub::sensor_msg.force_back_left = 50;
+      pub::sensor_msg.force_back_right = 50;
+      pub::sensor_msg.force_front_left = 50;
+      pub::sensor_msg.force_front_right = 50;
+      sensor_msg_pub.publish(pub::sensor_msg);
+    }
     // std::cout << "front arm: " << sub::grip_cmd.front_arm_deg << "\t back arm
     // "
     //           << sub::grip_cmd.back_arm_deg << std::endl;
