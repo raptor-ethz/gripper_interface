@@ -61,25 +61,27 @@ int main(int argc, char *argv[])
     grip_cmd_sub.listener->wait_for_data();
 
     int front_cmd = sub::grip_cmd.front_arm_deg;
+    std::cout << "Setting front arm to " << sub::grip_cmd.front_arm_deg << std::endl;
     serial.writeChar((char)front_cmd);
 
     int back_cmd = sub::grip_cmd.back_arm_deg + max_angle;
+    std::cout << "Setting back arm to " << sub::grip_cmd.back_arm_deg << std::endl;
     serial.writeChar((char)back_cmd);
 
     if (sub::grip_cmd.trigger_gripper == true)
     {
+      std::cout << "triggering gripper" << std::endl;
       serial.writeChar((char)180);
     }
 
-    if (sub::grip_cmd.get_sensor_val == true)
-    {
-      /*TODO*/
-      pub::sensor_msg.force_back_left = 50;
-      pub::sensor_msg.force_back_right = 50;
-      pub::sensor_msg.force_front_left = 50;
-      pub::sensor_msg.force_front_right = 50;
-      sensor_msg_pub.publish(pub::sensor_msg);
-    }
+    /*TODO*/
+    std::cout << "publishing sensor values" << std::endl;
+    pub::sensor_msg.force_back_left = 50;
+    pub::sensor_msg.force_back_right = 50;
+    pub::sensor_msg.force_front_left = 50;
+    pub::sensor_msg.force_front_right = 50;
+    sensor_msg_pub.publish(pub::sensor_msg);
+
     // std::cout << "front arm: " << sub::grip_cmd.front_arm_deg << "\t back arm
     // "
     //           << sub::grip_cmd.back_arm_deg << std::endl;
