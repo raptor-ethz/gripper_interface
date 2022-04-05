@@ -54,13 +54,17 @@ void setup() {
 
   // initialize serial:
 
-  Serial.begin(115200);
+  //Serial.begin(115200);
 
-  // Serial.begin(9600);
+  Serial.begin(9600);
 
   // use analog pin 1 for voltage measurement
 
+  pinMode(A0, INPUT);
+  pinMode(A1, INPUT);
   pinMode(A2, INPUT);
+  pinMode(A3, INPUT);
+
 
   // attaches the servos [r_servo-> D9, l_servo->D6]
 
@@ -75,13 +79,30 @@ void setup() {
 
 void loop() {
 
-  float sensorValue = analogRead(A2);
+  float sens0 = analogRead(A0);
+  float sens1 = analogRead(A1);
+  float sens2 = analogRead(A2);
+  float sens3 = analogRead(A3);
 
-  int message = (int)(sensorValue * 255.0 / 1024.0);
+  int msg0 = (int)(sens0 * 200.0 / 1024.0);
+  int msg1 = (int)(sens1 * 200.0 / 1024.0);
+  int msg2 = (int)(sens2 * 200.0 / 1024.0);
+  int msg3 = (int)(sens3 * 200.0 / 1024.0);
 
-  Serial.write(message);
-
-  // Serial.println(message);
+  //Serial.write(message);
+  /*Serial.write(210);
+  Serial.write(msg0);
+  Serial.write(220);
+  Serial.write(msg1);
+  Serial.write(230);
+  Serial.write(msg2);
+  Serial.write(240);
+  Serial.write(msg3);*/
+  Serial.println("=========");
+  Serial.println(msg0);
+  Serial.println(msg1);
+  Serial.println(msg2);
+  Serial.println(msg3);
 
   delay(100);
 }
