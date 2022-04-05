@@ -5,6 +5,8 @@
 
 #include <iostream>
 #include <string>
+#include <chrono>
+#include <thread>
 
 #include "domain_participant.h"
 #include "sub_callback.h"
@@ -31,9 +33,7 @@ int main(int argc, char *argv[])
   std::string serial_port = argv[1];
   std::cout << "Initializing serial connection to port " << serial_port
             << " ..." << std::endl;
-  // Fastdds (We need to create a new message for gripper commands, but for now
-  // we just use a position command message and use the x element to send
-  // gripper commands)
+  // Fastdds
 
   // Create participant. Arguments-> Domain id, QOS name
   DefaultParticipant dp(0, "gripper_interface");
@@ -43,8 +43,7 @@ int main(int argc, char *argv[])
   // Create publisher with msg type
   DDSPublisher sensor_msg_pub(idl_msg::GripperSensor_msgPubSubType(),
                               "gripper_sensor_msg", dp.participant());
-  // Intiailize fastdds subscriber
-  // cmd_sub.init();
+
   // Serial object
   serialib serial;
 
@@ -55,41 +54,66 @@ int main(int argc, char *argv[])
     return errorOpening;
   std::cout << "Successful connection to " << serial_port << std::endl;
 
-  // cout loop fro testing
   while (true)
   {
     grip_cmd_sub.listener->wait_for_data();
+    serial.flushReceiver();
 
     int front_cmd = sub::grip_cmd.front_arm_deg;
-    std::cout << "Setting front arm to " << sub::grip_cmd.front_arm_deg << std::endl;
     serial.writeChar((char)front_cmd);
 
     int back_cmd = sub::grip_cmd.back_arm_deg + max_angle;
-    std::cout << "Setting back arm to " << sub::grip_cmd.back_arm_deg << std::endl;
     serial.writeChar((char)back_cmd);
 
     if (sub::grip_cmd.trigger_gripper == true)
     {
       std::cout << "triggering gripper" << std::endl;
-      serial.writeChar((char)180);
+      serial.writeChar((char)181);
     }
 
-    /*TODO*/
-    std::cout << "publishing sensor values" << std::endl;
-    pub::sensor_msg.force_back_left = 50;
-    pub::sensor_msg.force_back_right = 50;
-    pub::sensor_msg.force_front_left = 50;
-    pub::sensor_msg.force_front_right = 50;
-    sensor_msg_pub.publish(pub::sensor_msg);
+    // print out command
+    std::cout << "arm(front/back): \t" << sub::grip_cmd.front_arm_deg << "\t "
+              << sub::grip_cmd.back_arm_deg << std::endl;
 
-    // std::cout << "front arm: " << sub::grip_cmd.front_arm_deg << "\t back arm
-    // "
-    //           << sub::grip_cmd.back_arm_deg << std::endl;
-    // char force_val = 'a';
-    // serial.readChar(&force_val, 20);
-    // if ((int)force_val != 97) {
-    //   std::cout << "force value: " << (int)force_val << std::endl;
-    // }
+    // reading sensor values
+    // std::cout << "reading sensor values" << std::endl;
+    serial.writeChar((char)180);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1)); // wait for arduino to respond
+    for (int i = 0; i < 20; i++)
+    {
+      char force_val = (char)126;
+      // std::cout << "FORCE" << (int)force_val << std::endl;
+      serial.readChar(&force_val, 20);
+      if ((int)force_val != 126) // check if nothing was read
+      {
+        if ((int)force_val == 110) // prefix for front left
+        {
+          serial.readChar(&force_val, 20);
+          pub::sensor_msg.force_front_left = (int)force_val;
+          // std::cout << "front left: " << (int)force_val << std::endl;
+        }
+        if ((int)force_val == 111) // prefix for front right
+        {
+          serial.readChar(&force_val, 20);
+          pub::sensor_msg.force_front_right = (int)force_val;
+          // std::cout << "front right: " << (int)force_val << std::endl;
+        }
+        if ((int)force_val == 112) // prefix for back left
+        {
+          serial.readChar(&force_val, 20);
+          pub::sensor_msg.force_back_left = (int)force_val;
+          // std::cout << "back left: " << (int)force_val << std::endl;
+        }
+        if ((int)force_val == 113) // prefix for back right
+        {
+          serial.readChar(&force_val, 20);
+          pub::sensor_msg.force_back_right = (int)force_val;
+          // std::cout << "back right: " << (int)force_val << std::endl;
+        }
+      }
+    }
+    std::cout << "sensor(br,bl,fr,fl): \t" << pub::sensor_msg.force_back_right << "\t" << pub::sensor_msg.force_back_left << "\t" << pub::sensor_msg.force_front_right << "\t" << pub::sensor_msg.force_front_left << "\t" << std::endl;
+    sensor_msg_pub.publish(pub::sensor_msg);
   }
   serial.closeDevice();
   return 0;

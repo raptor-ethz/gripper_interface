@@ -54,16 +54,16 @@ void setup() {
 
   // initialize serial:
 
-  //Serial.begin(115200);
+  Serial.begin(115200);
 
-  Serial.begin(9600);
+  //Serial.begin(9600);
 
   // use analog pin 1 for voltage measurement
 
-  pinMode(A0, INPUT);
-  pinMode(A1, INPUT);
   pinMode(A2, INPUT);
   pinMode(A3, INPUT);
+  pinMode(A4, INPUT);
+  pinMode(A5, INPUT);
 
 
   // attaches the servos [r_servo-> D9, l_servo->D6]
@@ -77,35 +77,53 @@ void setup() {
   l_servo.write(20);
 }
 
+int crop(int data, int lower_boundary, int upper_boundary) {
+  if (data > upper_boundary) {
+    return upper_boundary;
+  }
+  if (data < lower_boundary) {
+    return lower_boundary;
+  }
+  return data;
+}
+
 void loop() {
 
-  float sens0 = analogRead(A0);
-  float sens1 = analogRead(A1);
-  float sens2 = analogRead(A2);
-  float sens3 = analogRead(A3);
+  //analog read
+  /*float sens_fr = analogRead(A2);
+    float sens_fl = analogRead(A3);
+    float sens_br = analogRead(A4);
+    float sens_bl = analogRead(A5);
 
-  int msg0 = (int)(sens0 * 200.0 / 1024.0);
-  int msg1 = (int)(sens1 * 200.0 / 1024.0);
-  int msg2 = (int)(sens2 * 200.0 / 1024.0);
-  int msg3 = (int)(sens3 * 200.0 / 1024.0);
+    //normalize to 0-100
+    int msg_fr = (int)(sens_fr * 100.0 / 1024.0);
+    int msg_fl = (int)(sens_fl * 100.0 / 1024.0);
+    int msg_br = (int)(sens_br * 100.0 / 1024.0);
+    int msg_bl = (int)(sens_bl * 100.0 / 1024.0);*/
+
+  //check if in range
+  /*msg_fr = crop(msg_fr,0,100);
+    msg_fl = crop(msg_fl,0,100);
+    msg_br = crop(msg_br,0,100);
+    msg_bl = crop(msg_bl,0,100);*/
 
   //Serial.write(message);
-  /*Serial.write(210);
-  Serial.write(msg0);
-  Serial.write(220);
-  Serial.write(msg1);
-  Serial.write(230);
-  Serial.write(msg2);
-  Serial.write(240);
-  Serial.write(msg3);*/
-  Serial.println("=========");
-  Serial.println(msg0);
-  Serial.println(msg1);
-  Serial.println(msg2);
-  Serial.println(msg3);
-
-  delay(100);
+  /*Serial.write(110); //code for front_right
+    Serial.write(msg_fr);
+    Serial.write(111); //code for front_left
+    Serial.write(msg_fl);
+    Serial.write(112); //code for back_right
+    Serial.write(msg_br);
+    Serial.write(113); //code for back_left
+    Serial.write(msg_bl);*/
+  /*  Serial.println("=========");
+    Serial.println(msg0);
+    Serial.println(msg1);
+    Serial.println(msg2);
+    Serial.println(msg3);*/
 }
+
+
 
 bool check_object_detected() {
 
@@ -179,14 +197,36 @@ void serialEvent() {
       start_r = end_r + cmd;
     }
 
-    if ((cmd >= 2 * max_angle) &&
-        (cmd < 3 * max_angle)) { // grab with force sensor
+    if (cmd == 180) {
+      float sens_fr = analogRead(A2);
+      float sens_fl = analogRead(A3);
+      float sens_br = analogRead(A4);
+      float sens_bl = analogRead(A5);
 
-      int angle_r = start_r;
+      //normalize to 0-100
+      int msg_fr = (int)(sens_fr * 100.0 / 1024.0);
+      int msg_fl = (int)(sens_fl * 100.0 / 1024.0);
+      int msg_br = (int)(sens_br * 100.0 / 1024.0);
+      int msg_bl = (int)(sens_bl * 100.0 / 1024.0);
+      
+      //Serial.write(message);
+      Serial.write(110); //code for front_right
+      Serial.write(msg_fr);
+      Serial.write(111); //code for front_left
+      Serial.write(msg_fl);
+      Serial.write(112); //code for back_right
+      Serial.write(msg_br);
+      Serial.write(113); //code for back_left
+      Serial.write(msg_bl);
+    }
 
-      int angle_l = start_l;
+    if (cmd == 181) { // grab with force sensor (currently deactivated)
 
-      while (true) {
+      /*int angle_r = start_r;
+
+        int angle_l = start_l;
+
+        while (true) {
 
         if (angle_l < end_l) {
 
@@ -212,7 +252,7 @@ void serialEvent() {
 
           break;
         }
-      }
+        }*/
     }
   }
 }
