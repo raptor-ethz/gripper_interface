@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
                              &sub::grip_cmd, "grip_cmd", dp.participant());
   // Create publisher with msg type
   DDSPublisher sensor_msg_pub(idl_msg::GripperSensor_msgPubSubType(),
-                              "sensor_msg", dp.participant());
+                              "gripper_sensor_msg", dp.participant());
   // Intiailize fastdds subscriber
   // cmd_sub.init();
   // Serial object
