@@ -1,0 +1,6 @@
+{
+    "configuration": "cpu=atmega328",
+    "board": "arduino:avr:nano",
+    "sketch": "Arduino Files/Rot_Lin_Gripper/Rot_Lin_Gripper.ino",
+    "port": "/dev/ttyUSB0"
+}
