@@ -52,16 +52,18 @@ int main(int argc, char *argv[])
   // message
   char errorOpening = serial.openDevice(serial_port.c_str(), 115200);
   if (errorOpening != 1)
+  {
     return errorOpening;
+  }
   std::cout << "Successful connection to " << serial_port << std::endl;
 
   // initialize Data
-  char Command_Data[] = {255, 255, 0, 0, 0, 0, 0, 0};
-  char Test_Read[] = {0, 0, 0, 0, 0, 0, 0, 0};
+  unsigned char Command_Data[] = {0, 60, 60, 0, 0, 0};
+  uint8_t Test_Read[] = {0, 0, 0, 0, 0, 0, 0, 0};
   // {starting_bit, starting_bit, gripperType, servo1, servo2, servo3, triggerGripper, requestSensorInfo}
   char Sensor_Data[] = {0, 0, 0, 0};
   // {Sensor1,Sensor2,Sensor3,Sensor4}
-  while (true)
+  for (int i = 0;; i++)
   {
     /* SERIAL SENDING */
     // grip_cmd_sub.listener->wait_for_data();
@@ -73,16 +75,26 @@ int main(int argc, char *argv[])
     //  Command_Data[6] = (char)grip_cmd.trigger_gripper;
     //  Command_Data[7] = (char)grip_cmd.request_sensor;
     //  send bytes
-    serial.writeBytes(&Command_Data[0], sizeof(Command_Data));
-
+    if (i % 2 == 0)
+    {
+      Command_Data[1] = 45;
+      Command_Data[2] = 45;
+    }
+    if (i % 2 == 1)
+    {
+      Command_Data[1] = 80;
+      Command_Data[2] = 80;
+    }
+    serial.writeBytes(&Command_Data, sizeof(Command_Data));
+    std::cout << "just wrote" << (int)Command_Data[2] << std::endl;
     // /* SERIAL RECEIVING */
     // if (grip_cmd.request_sensor)
     // {
-    //   serial.readBytes(&Sensor_Data[0], sizeof(Sensor_Data), 250);
+    // serial.readBytes(&Sensor_Data[0], sizeof(Sensor_Data), 250);
     // }
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    serial.readBytes(&Test_Read[0], sizeof(Sensor_Data), 250);
-    std::cout << Test_Read[0] << "\t" << Test_Read[1] << "\t" << Test_Read[2] << "\t" << Test_Read[3] << "\t" << Test_Read[4] << "\t" << Test_Read[5] << "\t" << Test_Read[6] << "\t" << Test_Read[7] << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    // serial.readBytes(&Test_Read[0], sizeof(Sensor_Data), 250);
+    // std::cout << Test_Read[0] << "\t" << Test_Read[1] << "\t" << Test_Read[2] << "\t" << Test_Read[3] << "\t" << Test_Read[4] << "\t" << Test_Read[5] << "\t" << Test_Read[6] << "\t" << Test_Read[7] << std::endl;
   }
   serial.closeDevice();
   return 0;
