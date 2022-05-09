@@ -4,10 +4,10 @@
 // Define Limits (depended on gripper structure)
 
 // rotational gripper
-#define ROT_SRV1_OP 110 // TODO -> insert right vals
-#define ROT_SRV1_CL 0   // TODO -> insert right vals
-#define ROT_SRV2_OP 110 // TODO -> insert right vals
-#define ROT_SRV2_CL 0   // TODO -> insert right vals
+#define ROT_SRV1_OP 110
+#define ROT_SRV1_CL 0
+#define ROT_SRV2_OP 110
+#define ROT_SRV2_CL 0
 
 // linear gripper
 #define LIN_SRV1_UP 180 // TODO -> insert right vals
