@@ -76,11 +76,17 @@ int main(int argc, char *argv[])
 
     serial.writeBytes(&Command_Data, sizeof(Command_Data));
     // std::cout << "just wrote" << (int)Command_Data[2] << std::endl;
-    //  /* SERIAL RECEIVING */
-    //  if (grip_cmd.request_sensor)
-    //  {
-    //  serial.readBytes(&Sensor_Data[0], sizeof(Sensor_Data), 250);
-    //  }
+    /* SERIAL RECEIVING */
+    if (grip_cmd.request_sensor)
+    {
+      serial.readBytes(&Sensor_Data, sizeof(Sensor_Data));
+      // std::cout << Sensor_Data[0] << "\t" << Sensor_Data[1] << "\t" << Sensor_Data[2] << "\t" << Sensor_Data[3] << std::endl;
+      sensor_msg.force_back_left = (unsigned int)Sensor_Data[0];
+      sensor_msg.force_back_right = (unsigned int)Sensor_Data[1];
+      sensor_msg.force_front_left = (unsigned int)Sensor_Data[2];
+      sensor_msg.force_front_right = (unsigned int)Sensor_Data[3];
+      sensor_msg_pub.publish(sensor_msg);
+    }
     // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     // serial.readBytes(&Test_Read[0], sizeof(Sensor_Data), 250);
     // std::cout << Test_Read[0] << "\t" << Test_Read[1] << "\t" << Test_Read[2] << "\t" << Test_Read[3] << "\t" << Test_Read[4] << "\t" << Test_Read[5] << "\t" << Test_Read[6] << "\t" << Test_Read[7] << std::endl;
