@@ -17,7 +17,7 @@
 
 // rotational-linear gripper
 #define ROTLIN_SRV1_UP 180
-#define ROTLIN_SRV1_DW 80
+#define ROTLIN_SRV1_DW 90
 #define ROTLIN_SRV2_UP 180
 #define ROTLIN_SRV2_DW 90
 #define ROTLIN_SRV3_UP 155
@@ -26,7 +26,7 @@
 // define Servo Port numbers
 #define SRV_PORT_1 6
 #define SRV_PORT_2 9
-#define SRV_PORT_3 11
+#define SRV_PORT_3 10
 
 // define Sensor Port numbers
 #define SENSOR_PORT_1 A2
@@ -50,13 +50,15 @@ uint8_t tx_buffer[TX_BUFFER_SIZE];
 void setup()
 {
     // initialize Servos
-    Servo_1.attach(SRV_PORT_1, 750, 2250);
-    Servo_2.attach(SRV_PORT_2, 750, 2250);
-    // Servo_3.attach(SRV_PORT_3);
+    // Servo_1.attach(SRV_PORT_1, 750, 2250); //new servos
+    // Servo_2.attach(SRV_PORT_2, 750, 2250); //new servos
+    Servo_1.attach(SRV_PORT_1);
+    Servo_2.attach(SRV_PORT_2);
+    Servo_3.attach(SRV_PORT_3);
 
     // open gripper (not finished)
-    Servo_1.write(ROT_SRV1_OP);
-    Servo_2.write(ROT_SRV2_OP);
+    // Servo_1.write(ROT_SRV1_OP);
+    // Servo_2.write(ROT_SRV2_OP);
 
     // pinMode(SRV_PORT_1, OUTPUT);
     //  initialize Serial
@@ -86,12 +88,16 @@ void loop()
 {
 
     /* SERVO TEST */
-    // Servo_1.write(0);
-    // Servo_2.write(0);
+    // Servo_1.write(90);
+    // Servo_2.write(90);
+    // Servo_3.write(0);
+    // // Servo_2.write(0);
     // delay(1000);
-    // Servo_1.write(110);
-    // Servo_2.write(110);
-    // delay(3000);
+    // // Servo_1.write(110);
+    // Servo_3.write(110);
+    // Servo_1.write(170);
+    // Servo_2.write(170);
+    // delay(1000);
 
     /* SERIAL CONNECTION */
     if (Serial.available())
@@ -135,11 +141,11 @@ void loop()
         break;
     case 2: // rot-lin gripper
         // servo 1
-        Servo_1.write(cap(rx_buffer[1], ROTLIN_SRV1_UP, ROTLIN_SRV1_DW));
+        Servo_1.write(rx_buffer[1]);
         // servo 2
-        Servo_2.write(cap(rx_buffer[2], ROTLIN_SRV2_UP, ROTLIN_SRV2_DW));
+        Servo_2.write(rx_buffer[2]);
         // no servo 3
-        Servo_2.write(cap(rx_buffer[3], ROTLIN_SRV3_UP, ROTLIN_SRV3_DW));
+        Servo_3.write(rx_buffer[3]);
         // no grasp algo because no force sensors on rot-lin gripper
         // no force sensors on rot-lin gripper
         break;
